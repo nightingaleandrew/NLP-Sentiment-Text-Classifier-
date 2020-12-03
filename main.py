@@ -17,19 +17,7 @@ from classifier import dataPrep, runSystem, examples, predict_input, get_keyword
 from independent_sentence_analysis import *
 from accuracy_datasets import *
 
-#Setting up storage (All the sentences are stored in a dict if you do not want to create a db or txt file. On screen, it comes from the dict as might not want to create db or txt file)
-create_db = True #Let the program know if you would like to create a DB
-create_text_file = True #Let the program know if you would like ot create a text_file
-##files
-testing_data = './testing.tsv' #testing file
-training_data = './training.tsv' #training data file
-#Further variables
-choose_filename_db = 'sentences.db' #alter name of the database
-choose_filename_txt = 'sentences.txt' #alter name of the text file
-example_sentences = ["profit rose", "profits decreased", "we were awarded lots of awards", "items were bought by customers", "we throught the service was okay", "the best!"] #Example reviews I put through
-sentiments = ['negative', 'neutral', 'positive'] #Sentiments
-num = 10 ##See top of so many key words on screen for each sentiment
-
+import config #config vars 
 
 debug_mode = False #remember in debug mode, it initalises twice
 secret_key = 'verysecretkey123lol' #secret key for Flash
@@ -39,7 +27,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 #Class for config of the db using SQLAlchemy
 class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, choose_filename_db)
+        'sqlite:///' + os.path.join(basedir, config.choose_filename_db)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 app.config.from_object(__name__)
@@ -66,7 +54,7 @@ id = 0
 sentences_present = False
 
 #For the accurcies of the dataset according to basic vader. Just using testing data in this case
-accuracies = calculate_accuracies(testing_data, sentiments)
+accuracies = calculate_accuracies(config.testing_data, config.sentiments)
 
 #Class for the form on screen
 class InputForm(Form):
@@ -121,24 +109,24 @@ def run_examples(classifierSystem, sentences):
     return example
 
 # Run the classifier and run the example sentences through it
-classifier = create_classifier_func(testing_data, training_data)
-exampleSentences = run_examples(classifier[0], example_sentences)
+classifier = create_classifier_func(config.testing_data, config.training_data)
+exampleSentences = run_examples(classifier[0], config.example_sentences)
 accuracy = classifier[1]
 
 ##top keywords for each sentiment
-keywords = get_keywords(classifier[0], num, sentiments)
+keywords = get_keywords(classifier[0], config.num, config.sentiments)
 
-if ((create_db) and (not (os.path.isfile("./" + choose_filename_db)))): ##create database if not already created & add example files
+if ((config.create_db) and (not (os.path.isfile("./" + config.choose_filename_db)))): ##create database if not already created & add example files
     db.create_all()
     for example in exampleSentences:
         sentence = sentences(get_time(), example[1][0].capitalize(), example[0].capitalize(), reveal_scores(example[0]))
         db.session.add(sentence)
         db.session.commit()
 
-if ((create_text_file) and (not (os.path.isfile("./" + choose_filename_txt)))): #If file present then the example sentences won't be added again
+if ((config.create_text_file) and (not (os.path.isfile("./" + config.choose_filename_txt)))): #If file present then the example sentences won't be added again
     id = 1
     for example in exampleSentences:
-        write_to_disk(id, example[0].capitalize(), example[1][0].capitalize(), choose_filename_txt, reveal_scores(example[0]))
+        write_to_disk(id, example[0].capitalize(), example[1][0].capitalize(), config.choose_filename_txt, reveal_scores(example[0]))
         id += 1
 
 if (not sentences_present):
@@ -165,13 +153,13 @@ def create():
             prediction = predict_input(sentence, classifier[0])
             independent_sentiment = reveal_scores(sentence)
             sentence_details(id, sentence.capitalize(), prediction[0].capitalize(), get_time(), independent_sentiment)
-            id = file_len("./" + choose_filename_txt) + 1
+            id = file_len("./" + config.choose_filename_txt) + 1
             label = prediction[0].title()
             #Adds to text file if created
-            if (create_text_file):
-                write_to_disk(id, sentence.capitalize(), prediction[0].capitalize(), choose_filename_txt, independent_sentiment)
+            if (config.create_text_file):
+                write_to_disk(id, sentence.capitalize(), prediction[0].capitalize(), config.choose_filename_txt, independent_sentiment)
             #Adds to db if created by user
-            if (create_db):
+            if (config.create_db):
                 sentence = sentences(get_time(), prediction[0].capitalize(), sentence.capitalize(), independent_sentiment)
                 db.session.add(sentence)
                 db.session.commit()
@@ -180,7 +168,7 @@ def create():
             flash('Error: Sentence required')
 
     #Passes through template html file, form & textCases which is the dict of examples
-    return render_template('index.html', form = form, TestCases = testCases, accuracy = accuracy, accuracies=accuracies, keywords = keywords, num=num)
+    return render_template('index.html', form = form, TestCases = testCases, accuracy = accuracy, accuracies=accuracies, keywords = keywords, num=config.num)
 
 if __name__ == "__main__":
     app.secret_key = secret_key
