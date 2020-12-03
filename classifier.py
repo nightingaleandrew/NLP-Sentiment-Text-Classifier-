@@ -17,11 +17,6 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
 
-testing_data = './testing.tsv'
-training_data = './training.tsv'
-sentence = ["profit rose", "profits decreased", "the company won an award", "items were bought by customers", "we throught the service was good", "the best!"]
-# target_names = ['negative', 'neutral', 'positive']
-
 #Method to clean the data - Lemmiziser used rather than stemmer & stop words/numbers removed, put in lowercase too
 def dataPrep(file):
     all_data = []

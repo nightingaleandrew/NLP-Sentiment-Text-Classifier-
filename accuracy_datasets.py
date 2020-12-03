@@ -4,10 +4,6 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import csv
 
-
-#Sentiments given, this file only uses the testing data in this case.
-sentiments = ['positive', 'negative', 'neutral']
-filename = './testing.tsv'
 analyzer = SentimentIntensityAnalyzer()
 
 

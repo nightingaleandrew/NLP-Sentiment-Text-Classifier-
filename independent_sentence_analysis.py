@@ -3,9 +3,6 @@
 #imports
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-#Sentence
-# sentence = "profits increased by 100% last year"
-
 #Function to decide the sentiment of the statement accoridng to vader
 def decide_sentiment(sentence):
     # Create a SentimentIntensityAnalyzer object.
