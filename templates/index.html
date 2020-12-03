@@ -1,0 +1,128 @@
+<html>
+<!-- This is the html file for the Flask front end for the classifier application -->
+<head>
+  <title>Andrew's NLP Processor</title>
+  <link rel="stylesheet" media="screen" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" /> -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    table {
+      margin: 0 5% 0 5%;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">NLP Processor </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link disabled href=">Home</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="">Andrew's Language Processor</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled href=">History of NLP</a> <!-- Some of these tabs are apart of a wider application I am looking to build after this project -->
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled href=">NLP in the News</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="container"><br>
+    <center>
+      <h2>Andrew's Language Processor</h2>
+    </center>
+  </div>
+
+  <div class="container">
+    <br />
+    <div class="row align-items-center justify-content-center">
+      <div class="col-md-4">
+        <form action="" method="post" role="form">
+          {{ form.csrf }} <!--Form to submit the possible sentence -->
+          <div class="form-group">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+
+            {% for message in messages %}
+            {% if "Error" not in message[1]: %}
+            <div class="alert alert-info">
+              <strong>Success! </strong> {{ message[1] }}
+            </div>
+            {% endif %}
+
+            {% if "Error" in message[1]: %}
+            <div class="alert alert-danger">
+              <strong>Error: </strong> {{ message[1] }}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            <label for="sentence">Test your sentence:</label>
+            <input type="text" class="form-control" id="sentence" name="sentence" placeholder="Sentence text" />
+            <br>
+            <center>
+              <button type="submit" class="btn btn-success">Test</button>
+              <br />
+              <label>
+                Trained Model Accuracy Score: {% print(accuracy) %}% <!--Score of the accuracy of the classifier-->
+              </label>
+            </center>
+          </div>
+        </form>
+        <br>
+      </div>
+      <table style="width:100%" class="table">
+        <tr>
+          <th>Sentence</th>
+          <th>Trained Classifier Label</th>
+          <th>Vader Independent Analysis <strong>(Not Classifier)</strong></th>
+        </tr>
+        {% for testCase in TestCases %} <!--Table to show the sentences -->
+        <tr>
+          <td> {{testCase["text"]}} </td>
+          <td> {{testCase["label"]}} </td>
+          <td> {{testCase["independent_sentiment"]}} </td>
+        </tr>
+        {% endfor %}
+      </table>
+      <br />
+      <br />
+      <label>Accuracy of DataSets according to Basic Vader Sentiment Analyser <Strong>(Not Training Classifier)</Strong></label>
+      <ul>
+        {% for accuracy in accuracies %} <!--To show the accuracy from the basic vader sentiment analyser-->
+        <li> {{accuracy}} </li>
+        {% endfor %}
+      </ul>
+      <div>
+      </div>
+      <div>
+        <br />
+        <center>
+          <label><Strong>Top {{ num }} words for each sentiment (Training Classifier):</Strong></label> <!--How many top keywords want to be shown?-->
+        </center>
+        <ul>
+          {% for keywordlist in keywords %} <!--To show the keywords from the classifier-->
+          <li> {{keywordlist}} </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <br />
+
+      <br />
+    </div>
+    <br />
+  </div>
+</body>
+
+</html>
